@@ -211,7 +211,7 @@ rauc=function (formula, dat, s=1, lambda=1, kernel="linear", para=NULL,
 #    Q.pred = getQ(K,n1=n1,n2=n2,call.C=T,do.pred=TRUE)/lambda
 #    linear.combination=Q.pred %*% alpha.pred    
 
-     #fast.auc(Q.pred %*% (dh2.deta + alpha),)
+     #fastauc(Q.pred %*% (dh2.deta + alpha),)
     if (length(alpha.pred)!=n1*n2) stop("length(alpha.pred)!=n1*n2") # for whatever reason (e.g. the aborted pAUC development) if this happens, it is bad
     #.C("get_Q_pred_x",.Machine$double.eps, K=K, n1=n1, n2=n2,npred = n,x=alpha.pred,Qx = lin.comb, DUP = FALSE, NAOK = FALSE,PACKAGE = "aucm")
     lin.comb = .Call("get_Q_pred_x", K=K, n1=n1, n2=n2, x=alpha.pred, .Machine$double.eps)
@@ -229,7 +229,7 @@ rauc=function (formula, dat, s=1, lambda=1, kernel="linear", para=NULL,
         alpha.pred=drop(alpha.pred),
         linear.combination=drop(linear.combination),
         last.minQuad.fit=fit,
-        train.auc=fast.auc(drop(linear.combination), c(rep(1,n1),rep(0,n2))),
+        train.auc=fastauc(drop(linear.combination), c(rep(1,n1),rep(0,n2))),
         saturation=mean(eta.new>.5*s | eta.new< -.5*s),
         losses=losses,
         penalized.losses=penalized.losses,
