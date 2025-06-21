@@ -1,0 +1,219 @@
+2012 06-01 V_0.0.5 Krisz/Youyi
+    * There is a branching after 0.0.5. Krisz developed 0.0.6- to test various
+    quadratic optimizers and working set selection strategies to improve
+    convergence of the quadratic optimization problem.
+
+2012-06-25 0.0.6
+    * Add init.alpha
+        
+    * Implement 'PBB' quadratic optimizer. 'PBB' was later discarded for 'tron' 
+    
+    * Add optimizers 'tron' quadratic optimizer
+
+    * Add working set selection strategies 'v','v2','rv','rvwr','rv2wg','rvwg'
+    
+2012-07-06  0.0.7 Krisz
+    * Develop 'exhaustive' quadratic optimizer. Added interfaces to get the inverse 
+    of a matrix by LU-factorization and by Moore-Penrose inverse from LAPACK
+    
+
+2012-07-25  0.0.8 Krisz
+   * Add 'hideo' quadratic optimizer from SVM_LIGHT implementation
+
+2012-08-14  V_0.0.5 Youyi/Krisz
+    * developed 0.1.5- to add small improvements while keeping the original
+    optimizer (minQuad) and original working set selection strategy (greedy).
+
+2012-08-14  V_0.1.5 Youyi
+    * Add init.alpha
+
+2012-10-08  V_0.1.7 Krisz
+
+    * Add mem.efficient - add get_Qx C function and replace all Q %*% x calls in rauc by a 
+    call to get_Qx. get_Qx uses Shuxin's indexing to obtain entries in 'Q_{n1n2 x n1n2}' from
+    entries in K_{n1+n2 x n1+n2}. Note that get_Qx does not implement roll-out sums (LAPACK) 
+    or KAHAN summing and thus is less accurate than R's crossprod(). However we do not expect
+    to run this algorithm on n > 500 hence n1n2 is no greater than ~ 250,000.   
+
+2012-10-08  V_0.1.8 Krisz/Youyi
+
+    * define intCEIL
+    * V_0.0.5 shows more warning about minQuad not converged than V_0.1.8.
+    This is probably due to the fact that minQuad tolerance is set to 1e-7 in
+    V_0.0.5 and 1e-4 in V_0.1.8.
+    * copy getK from svmw and remove dependency on svmw
+    * add vcov.gridsearch, sim.NL1, remove sim.MH12
+
+ 2012-10-16 V_0.1.9 Krisz
+    * Removed all VLA declarations (to improve scalability) whose size ~ n,n^2
+      in every function that accesses the matrices 'Q' or 'K' (minQuad(),get_Q(),..)
+      One can check logic by uncommenting '#define DO_VLA' and recompiling
+      There are still VLA declarations for 2 2x2 matrices and 1 4x2 matrix and few small arrays of length 2, that is ok
+    * Added Kahan-summing via '#define DO_KAHAN' for mem.efficient = T/F
+      note the 'volatile' keyword: 
+      http://stackoverflow.com/questions/72552/why-does-volatile-exist - someone actually mentions Kahan sum     
+      http://stackoverflow.com/questions/246127/why-is-volatile-needed-in-c - an example x + h - x
+    * added on.exit() to minQuad.R to free memory in case R session is interrupted
+      (alternatively could request dynamic memory from R's heap by
+       '#defining' CALLOC as in package 'rpart')      
+    * removed all function calls from the 'main' while() loop in minQuad.c   
+    * VLA without KAHAN summing may be faster by as much as 25% based on few runs with sim.dat.1
+    * Fixed a bug in minQuad that existed since V_0.1.7. if one did not specify n1 = 0, n2 = 0 explicitely even if
+       mem.efficient = FALSE (the default n1 = NULL, n2 = NULL) then a SEGV can.will occur in .C())
+    * Added mem.efficient input argument to minQuad()
+    * Modified rauc_2.R according to change in minQuad's interface
+      Modified minQuad.Rd file together with its examples
+    * Modified rauc.Rd file slightly
+    * mem.efficient defaults to TRUE in rauc() but FALSE in minQuad()
+    * updated minQuad.Rd help file and changed argument of minQuad to 'H' 
+    * added 'control' interface to minQuad()
+    * recompiled minQuad with Kahan-summing if mem.efficient = TRUE to be able to compare it to qp-optimizer 'TRON' in 'aucmx' for n = 300
+    
+
+2012-11-29 V_0.1.9 Krisz
+    * aucm_0.1.9 was slower than 0.1.8 because I removed/commented out 'if statements' 
+      that check if 'x == 0.0', which avoids further computation. I removed these statements
+      when updating 'Ha = H %*% alpha' for H = K,Q in minQuad.c and also in the function get_Qx(), because I started 
+      aucm_0.1.9 from scratch to make a cleaner code.
+
+    * differences from V_0.1.8:   
+    * It does not make any user-defined function calls in the main loop
+    * It does not compute the restricted objective function unless it has to  
+    * I changed the order of the loops in get_Qx() to skip the inner loop if 'x == 0.0'
+
+2012-12-11 V_0.1.10 Krisz
+    * Combined V_0.1.5 'default' optimizer with 'tron','hideo', and 'exhaustive' optimizers.
+    R's minQuad calls minQuad_2.c if 'default' is specified or minQuad.c if any of the
+    other optimizers are specified or if working set size 'q' > 2
+
+    * Added 'dynamic = T/F' to select size of working set size q = sqrt(# of violators) at each
+    minQuad iteration
+    
+    * Added get_Q_pred C function to get linear.combination in rauc() and avoid declaring
+    npred x n1n2 matrix in R. No KAHAN-summing or roll-out summing is implemented for this.
+    
+    * call to gc() by default before rauc() returns
+    
+2012-12-11 V_0.1.11 Krisz
+    * remove dymanic = T/F but make it the default if optimizer = 'tron'
+      In that case working set size is NULL and a '0' is passed to C
+    * updated help file minQuad.Rd, created control.minQuad.Rd
+    * changed the 'optimizer' argument name to 'method' in control.minQuad
+      (it'd be more familiar to users if we made minQuad's interface as similar 
+      as possible to that of optim())
+
+2012-12-11 V_0.1.12 Youyi
+        * Add sdca functions
+        * fix qp_solvers.c:40:errno undeclared on linux
+        * re-introduce youyi's code in v-0.1.8
+        * fixed a bug in sim.dat.1, it changes the simulation results
+        * add partial auc maxi to rauc function
+
+2012-12-26 V_0.1.13 Youyi
+        * remove pAUC code since that is not right 
+        * modify dtron to pass function pointers to update functions in
+        * introduce auc class, which is parent of sauc, rauc, gridsearch, and
+        sdca and rlogit, add coef and predict for auc
+        * add test code to ?aucm packag help page
+
+2013-01-07 V_0.1.14 Krisz
+
+        * fixed the get_Q_pred_x function by reverting to my original code 
+        (the one underneath it that is commented out). 
+        * warning messages in C code:
+        * The loqo. warnings were easy/quick fixes.
+        * The hideo.c warning is a little worrisome: The logic assumes 0 <= b1,b2 < n and thus g0_b1,g0_b2 will be initialized but the compiler does not 
+        know that assumption. Hopefully it is correct. I added 2 initialization lines at lines 243,372 and 395 
+        but I am not spending any time on testing it or understanding why this un-initialization is so. 
+        The code is no worse than it was before this change.
+
+        'dtrpcg' accepts an int* 'iters' which is used as a loop counter and the caller, not the callee, 
+        uses the value computed (aside from being used as a loop counter) so I do not understand why the 
+        compiler complains and it does worry me a little bit as it should not complain:
+
+        dtrpcg.c: In function 'dtrpcg':
+        dtrpcg.c:157:26: warning: value computed is not used [-Wunused-value]
+
+        At line 157 I made the change:
+
+        *iters++ -> (*iters)++
+
+        Now it does not complain. 
+
+
+        The message below has no easy fix. The function 'dprecond' returns a double but that double is not used 
+        in dspcg. So the authors simply store the value so that all compilers compile it, at the expense of this 
+        warning in windows for this compiler:
+        dspcg.c: In function 'dspcg':
+        dspcg.c:113:40: warning: variable 'alpha' set but not used [-Wunused-but-set-variable]
+
+2013-01-10 V_0.1.14 Youyi
+        * modifies tron source code to allow for convex optimization
+        * sauc.dca() code in R for linear kernel
+        * sauc_dca_tron() C interface to tron for linear kernel
+        
+2013-01-17 V_0.1.15 Krisz/Youyi     
+        * completed sauc.dca() that Youyi made
+        * sauc.dca() code in R for linear and nonlinear kernels using optim() or tron()
+        * sauc_dca_tron() C interface to tron for linear and nonlinear kernel
+        * change sauc.phi so that the default max.it is 1e3 and even if not
+        converging, parameter estimate from the last iteration is returned
+        * change BYlogreg so that even when not converged, the combination
+        from the last iteration is returned
+
+2013-02-07 V_0.1.15 Krisz
+       *  adjusted the function value returned by minQuad when solveQuad was specified as solveQuad uses the parametrization 
+          a'Qa - b'a whereas minQuad uses 0.5a'Q'+b'a (divided the returned function value of solveQuad and minQuad_2 by 2.0)
+        
+2013-04-04 V_0.1.16 Krisz
+       * added ibs_kernel.c and R function ibs.kernel() that calls C code and 
+         R_ibs() function, an R implementation.
+       
+       * added DXD() function to matrix.c
+       * added the function 'matprod' to matrix.c    
+
+       * Experimental:
+       * individual upper-bounds on variables (weighted svm) to be used by
+         'hideo' and 'loqo' but something is wrong - both optimizers fail
+       
+       * added to control.minQuad the 'NAOK' option to .C() call 
+       * we must set NAOK = TRUE in calls to from minQuad(in R) to minQuad(in C)
+         this is because - take the variable 'value' = 0.5*a'Ha + b'a 
+         if DUP = FALSE and a previous call to minQuad resulted in a NaN value to be returned,
+         the next call to minQuad(R) will pass value=NaN to minQuad(C), even though the R script
+         "tries" to set 'value = as.double(0)'. In C it will be set to 0.0, but never makes it there
+        due to NAOK = FALSE. But do not want NAOK = TRUE by default since we do not process
+        NAs in minQuad. 
+
+2013-04-04 V_0.1.17 Youyi
+    * sdca work
+
+2013-07-24 V_0.1.18 Youyi
+    * implement decomposition algorithm for sdca
+    * replace s with 1/s in rauc so that s is the same as described in paper
+
+2013-08-20 V_0.1.20 Krisz
+    * minQuad (R): - renamed argument 'working.set' to 'ws' and ret.wset to ret.ws, changed .Rd files 
+    *             - loqo: added arguments lower,upper,mat.constr,lhs.constr,rhs.constr
+    *                hideo: removed
+    * added get_sub_matrix() to matrix.c which can handle row or column-major input and output matrices in any combination. separated working_set.c into:
+    * sort.h/sort.c                             // revsort
+    * random.h/random.c                  // sampling routines + rank()
+    * working_set.h/working_set.c     // only working set selection routines
+    * Now one only need to include "working_set.h" in the sauc-related .c files
+    * added the 'static' keyword for all global variables in sauc-related files and qp_solver.c . A better way to do this can be found in MutRSeq package.
+    * loqo algorithmically starts from an infeasible point of its own choosing (infeasible with respect to the simple bound constraints lower and upper) at q = 2 and does not get away from that point. Forcing a pre-specified starting point or bounding the solution to [lower,upper] does not seem to help.
+
+2013.12-10 Youyi
+    * change default value for initwml to FALSE in BYlogreg
+
+2015.12-28 Youyi
+    * rename BYlogreg to rlogit and remove dependence on rrcov
+    * sim.dat.1 changed between 0.1.20 and aucm_2013.12-10
+    * 
+
+2019.12-1
+    * Rename duplicated names
+
+2022.4-6
+    * Fix blas issues FCONE
