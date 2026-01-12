@@ -2,6 +2,10 @@
 #include <R_ext/BLAS.h>
 #include <R.h>
 
+#ifndef FCONE
+# define FCONE
+#endif
+
 #define PRINTF Rprintf
 #define EXTRA_LOGIC
 #define MAX_STEPS 1000
@@ -107,7 +111,7 @@ c     **********
 		interp = 1;
 	else
 	{
-		F77_CALL(dsymv)("U", &n, &one, A, &n, s, &inc, &zero, wa, &inc);
+		F77_CALL(dsymv)("U", &n, &one, A, &n, s, &inc, &zero, wa, &inc FCONE);
 		gts = F77_CALL(ddot)(&n, g, &inc, s, &inc);
 		q = 0.5*F77_CALL(ddot)(&n, s, &inc, wa, &inc) + gts;
 		interp = q >= mu0*gts ? 1 : 0;
@@ -130,7 +134,7 @@ c     **********
 			dgpstep(n, x, xl, xu, -(*alpha), g, s);
 			if (F77_CALL(dnrm2)(&n, s, &inc) <= delta)
 			{
-				F77_CALL(dsymv)("U", &n, &one, A, &n, s, &inc, &zero, wa, &inc);
+				F77_CALL(dsymv)("U", &n, &one, A, &n, s, &inc, &zero, wa, &inc FCONE);
 				gts = F77_CALL(ddot)(&n, g, &inc, s, &inc);
 				q = 0.5 * F77_CALL(ddot)(&n, s, &inc, wa, &inc) + gts;
 				search = q > mu0*gts ? 1 : 0;
@@ -160,7 +164,7 @@ c     **********
 			dgpstep(n, x, xl, xu, -(*alpha), g, s);
 			if (F77_CALL(dnrm2)(&n, s, &inc) <= delta)
 			{
-				F77_CALL(dsymv)("U", &n, &one, A, &n, s, &inc, &zero, wa, &inc);
+				F77_CALL(dsymv)("U", &n, &one, A, &n, s, &inc, &zero, wa, &inc FCONE);
 				gts = F77_CALL(ddot)(&n, g, &inc, s, &inc);
 				q = 0.5 * F77_CALL(ddot)(&n, s, &inc, wa, &inc) + gts;
 				search = q < mu0*gts ? 1 : 0;
