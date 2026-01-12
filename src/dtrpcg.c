@@ -3,6 +3,10 @@
 #include <string.h>
 #include <R_ext/BLAS.h>
 
+#ifndef FCONE
+# define FCONE
+#endif
+
 extern void *xmalloc(size_t);
 /* LEVEL 1 BLAS */
 /* extern int daxpy_(int *, double *, double *, int *, double *, int *); */
@@ -137,7 +141,7 @@ c     **********
 		w[i] = 0;
 		r[i] = t[i] = -g[i];
 	}
-	F77_CALL(dtrsv)("L", "N", "N", &n, L, &n, r, &inc);
+	F77_CALL(dtrsv)("L", "N", "N", &n, L, &n, r, &inc FCONE);
 
 	/* Initialize the direction p. */
 	memcpy(p, r, sizeof(double)*n);
@@ -160,13 +164,13 @@ c     **********
 		
 		/* Compute z by solving L'*z = p. */
 		memcpy(z, p, sizeof(double)*n);
-		F77_CALL(dtrsv)("L", "T", "N", &n, L, &n, z, &inc);
+		F77_CALL(dtrsv)("L", "T", "N", &n, L, &n, z, &inc FCONE);
 
 		/* Compute q by solving L*q = A*z and save L*q for
 		use in updating the residual t.	*/
-		F77_CALL(dsymv)("U", &n, &one, A, &n, z, &inc, &zero, q, &inc);
+		F77_CALL(dsymv)("U", &n, &one, A, &n, z, &inc, &zero, q, &inc FCONE);
 		memcpy(z, q, sizeof(double)*n);
-		F77_CALL(dtrsv)("L", "N", "N", &n, L, &n, q, &inc);
+		F77_CALL(dtrsv)("L", "N", "N", &n, L, &n, q, &inc FCONE);
 		
 		/* Compute alpha and determine sigma such that the trust region
 		constraint || w + sigma*p || = delta is satisfied. */
