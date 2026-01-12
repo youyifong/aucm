@@ -107,8 +107,8 @@ c     **********
 		nsteps++;
 		dgpstep(n, x, xl, xu, alpha, w, wa1);
 		F77_CALL(dsymv)("U", &n, &one, A, &n, wa1, &inc, &zero, wa2, &inc FCONE);
-		gts = F77_CALL(ddot)(&n, g, &inc, wa1, &inc FCONE);
-		q = 0.5*F77_CALL(ddot)(&n, wa1, &inc, wa2, &inc FCONE) + gts;
+		gts = F77_CALL(ddot)(&n, g, &inc, wa1, &inc );
+		q = 0.5*F77_CALL(ddot)(&n, wa1, &inc, wa2, &inc ) + gts;
 		if (q <= mu0*gts)
 			search = 0;
 		else
@@ -127,7 +127,7 @@ c     **********
 
 	/* Compute the final iterate and step. */
 	dgpstep(n, x, xl, xu, alpha, w, wa1);
-	F77_CALL(daxpy)(&n, &alpha, w, &inc, x, &inc FCONE);
+	F77_CALL(daxpy)(&n, &alpha, w, &inc, x, &inc );
 	for (i=0;i<n;i++)
 		x[i] = mymax(xl[i], mymin(x[i], xu[i]));
 	memcpy(w, wa1, sizeof(double)*n);
