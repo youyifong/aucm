@@ -398,8 +398,9 @@ void print_matrix(int m,int n,double* x){
 //    double (*x)[n] = (double (*)[n])_x;
     for(int i = 0;i < m;i++){
         for(int j = 0;j < n;j++)
-			//Rprintf("%+.4e ",x[CX(i,j,m)]);
+		{		//Rprintf("%+.4e ",x[CX(i,j,m)]);
         Rprintf("\n");
+		}
     } 
 }
 
