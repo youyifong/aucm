@@ -26,6 +26,7 @@
 #include <R_ext/Lapack.h>
 #include <R_ext/Linpack.h>
 
+
 #define	MAX(A,B)	((A) > (B) ? (A) : (B))
 #define	MIN(A,B)	((A) < (B) ? (A) : (B))
 #define	ABS(A)  	((A) > 0 ? (A) : (-(A)))
@@ -318,7 +319,7 @@ int* counter,int* convergence,int* error_code)
 	
 	ibuffer = (int *)malloc((size_t)ibuffer_size * sizeof(int));
 	if(!ibuffer){
-		Rprintf("Unable to allcoate %i bytes in function %s\n",ibuffer_size * sizeof(int),"loqo");
+		//Rprintf("Unable to allcoate %i bytes in function %s\n",ibuffer_size * sizeof(int),"loqo");
 		*convergence = MEMORY_ALLOCATION_FAILURE;		
 		return;
 	}	int* ipiv = ibuffer;
@@ -330,7 +331,7 @@ int* counter,int* convergence,int* error_code)
 	if(internal_buffer){
 		dbuffer = (double *)calloc((size_t)dbuffer_size , sizeof(double));
 		if(!dbuffer){
-			Rprintf("Unable to allcoate %i bytes in function %s\n",dbuffer_size * sizeof(double),"loqo");
+			//Rprintf("Unable to allcoate %i bytes in function %s\n",dbuffer_size * sizeof(double),"loqo");
 			*convergence = MEMORY_ALLOCATION_FAILURE;
 			return;
 		}
@@ -555,7 +556,7 @@ int* counter,int* convergence,int* error_code)
 		// LAPACK LDL' or UDU' factor of symmetric indefinite matrix
 		
 		int LWORK = -1;
-		F77_CALL(dsytrf)("U",&m_plus_n,KKT0,&m_plus_n,ipiv,work,&LWORK,&info); 
+		F77_CALL(dsytrf)("U",&m_plus_n,KKT0,&m_plus_n,ipiv,work,&LWORK,&info FCONE); 
 		if(info){
 			*convergence = LAPACK_ERROR;	
 			*error_code = info;
@@ -568,7 +569,7 @@ int* counter,int* convergence,int* error_code)
 		double* WORK = work;
 		LWORK = (int)work[0];
 		if(LWORK > lwork) WORK = (double*)malloc((size_t)(LWORK * sizeof(double)));
-		F77_CALL(dsytrf)("U",&m_plus_n,KKT0,&m_plus_n,ipiv,WORK,&LWORK,&info); 
+		F77_CALL(dsytrf)("U",&m_plus_n,KKT0,&m_plus_n,ipiv,WORK,&LWORK,&info FCONE); 
 		if(LWORK > lwork) free(WORK);
 		if(info){
 			*convergence = LAPACK_ERROR;	
@@ -590,7 +591,7 @@ int* counter,int* convergence,int* error_code)
 			// return;
 		// }	
 		
-		F77_CALL(dsytrs)("U",&m_plus_n,&ione, KKT0, &m_plus_n, ipiv, x,&m_plus_n,&info);
+		F77_CALL(dsytrs)("U",&m_plus_n,&ione, KKT0, &m_plus_n, ipiv, x,&m_plus_n,&info FCONE);
 		if(info){
 			Rprintf("error code %d from Lapack routine '%s'\n", info, "dsytrs");
 			*convergence = LAPACK_ERROR;	
@@ -888,7 +889,7 @@ int* counter,int* convergence,int* error_code)
 			get_reduced_KKT_matrix(n,m,H_x,A,d,e,KKT0);// KKT0 will be destroyed by LAPACK		
 			
 			int LWORK = -1;
-			F77_CALL(dsytrf)("U",&m_plus_n,KKT0,&m_plus_n,ipiv,work,&LWORK,&info); 
+			F77_CALL(dsytrf)("U",&m_plus_n,KKT0,&m_plus_n,ipiv,work,&LWORK,&info FCONE); 
 			if(info){
 				*convergence = LAPACK_ERROR;	
 				*error_code = info;
@@ -900,7 +901,7 @@ int* counter,int* convergence,int* error_code)
 			double* WORK = work;
 			LWORK = (int)work[0];
 			if(LWORK > lwork) WORK = (double*)malloc((size_t)(LWORK * sizeof(double)));
-			F77_CALL(dsytrf)("U",&m_plus_n,KKT0,&m_plus_n,ipiv,WORK,&LWORK,&info); 
+			F77_CALL(dsytrf)("U",&m_plus_n,KKT0,&m_plus_n,ipiv,WORK,&LWORK,&info FCONE); 
 			if(LWORK > lwork) free(WORK);
 			if(info){
 				*convergence = LAPACK_ERROR;	
@@ -922,7 +923,7 @@ int* counter,int* convergence,int* error_code)
 				// return;
 			// }	
 
-			F77_CALL(dsytrs)("U", &m_plus_n, &ione, KKT0, &m_plus_n,ipiv, delta_x, &m_plus_n, &info);
+			F77_CALL(dsytrs)("U", &m_plus_n, &ione, KKT0, &m_plus_n,ipiv, delta_x, &m_plus_n, &info FCONE);
 			if(info){
 				*convergence = LAPACK_ERROR;	
 				*error_code = info;
@@ -1079,7 +1080,7 @@ int* counter,int* convergence,int* error_code)
 
 		if(lapack_solver == LDL){
 			// LDL-solve step reusing LDL-factorization in KKT0		
-			F77_CALL(dsytrs)("U", &m_plus_n, &ione, KKT0, &m_plus_n,ipiv, delta_x, &m_plus_n, &info);
+			F77_CALL(dsytrs)("U", &m_plus_n, &ione, KKT0, &m_plus_n,ipiv, delta_x, &m_plus_n, &info FCONE);
 			if(info){
 				*convergence = LAPACK_ERROR;	
 				*error_code = info;
