@@ -399,7 +399,7 @@ void print_matrix(int m,int n,double* x){
     for(int i = 0;i < m;i++){
         for(int j = 0;j < n;j++)
 			//Rprintf("%+.4e ",x[CX(i,j,m)]);
-        //Rprintf("\n");
+        Rprintf("\n");
     } 
 }
 
@@ -578,7 +578,9 @@ int ginv(double tol,int M, int N,double* x,double* xinv,double* sval){
 	// u,vt,s,D,work
 	int buffer_size = M*M + N*N + q + N * M + lwork; 
     double *_p = (double *) malloc(buffer_size * sizeof(double));
-	if(!_p){//Rprintf("Memory allocation error\n");return 1;}
+	if(!_p){
+			//Rprintf("Memory allocation error\n");
+			return 1;}
 	double* p = _p;
 	
 	double* u = p;p+=M*M;
