@@ -170,7 +170,7 @@ c     **********
 		use in updating the residual t.	*/
 		F77_CALL(dsymv)("U", &n, &one, A, &n, z, &inc, &zero, q, &inc FCONE);
 		memcpy(z, q, sizeof(double)*n);
-		F77_CALL(dtrsv)("L", "N", "N", &n, L, &n, q, &inc FCONE);
+		F77_CALL(dtrsv)("L", "N", "N", &n, L, &n, q, &inc FCONE FCONE FCONE);
 		
 		/* Compute alpha and determine sigma such that the trust region
 		constraint || w + sigma*p || = delta is satisfied. */
