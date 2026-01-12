@@ -147,8 +147,8 @@ void dcsauc_tron(
 
     while(!*convergence){
                          
-        if(*verbose)PRINTF("Tron #%i, fatol(%.10f) frtol(%.10f) cgtol(%.10f) gtol(%.10f) maxfev(%i)\n",
-                        cnt,fatol,frtol,cgtol,*_gtol,*_maxfev);
+//if(*verbose)PRINTF("Tron #%i, fatol(%.10f) frtol(%.10f) cgtol(%.10f) gtol(%.10f) maxfev(%i)\n",
+  //                      cnt,fatol,frtol,cgtol,*_gtol,*_maxfev);
         nfev_sauc_dca = 0;         
         // p is number of covariates, it is called n in dtron
         *_f=dtron(p, solution, x_lo, x_up, *_gtol, frtol, fatol, fmin, *_maxfev, cgtol,convergence, *verbose, &ugradhes_sauc_dca, &ufv_sauc_dca);
