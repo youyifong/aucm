@@ -32,7 +32,9 @@
 #include <R.h>
 #define PRINTF Rprintf
 
-
+#ifndef FCONE
+# define FCONE
+#endif
 extern void *xmalloc(size_t);
 extern double mymin(double, double);
 extern double mymax(double, double);
@@ -222,7 +224,7 @@ ufvptr: a function pointer to update function value
 //		if(trace > 1) {
 //             PRINTF("wa "); for (int i_s=0; i_s<n; i_s++) PRINTF("%f ", wa[i_s]); PRINTF("\n");		
 //        }		
-		F77_CALL(dsymv)("U", &n, &p5, A, &n, s, &inc, &one, wa, &inc);
+		F77_CALL(dsymv)("U", &n, &p5, A, &n, s, &inc, &one, wa, &inc FCONE);
 //		if(trace > 1) {
 //             PRINTF("x "); for (int i_s=0; i_s<n; i_s++) PRINTF("%f ", x[i_s]); PRINTF("\n");		
 //             PRINTF("s "); for (int i_s=0; i_s<n; i_s++) PRINTF("%f ", s[i_s]); PRINTF("\n");		
