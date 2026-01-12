@@ -947,7 +947,7 @@ int* counter,int* convergence,int* error_code)
 				Rprintf("error code %d from Lapack routine '%s'\n", info, "dgetrf");
 				return;
 			}					
-			F77_CALL(dgetrs)("N", &m_plus_n, &ione, KKT0, &m_plus_n,ipiv, delta_x, &m_plus_n, &info);
+			F77_CALL(dgetrs)("N", &m_plus_n, &ione, KKT0, &m_plus_n,ipiv, delta_x, &m_plus_n, &info FCONE);
 			if(info){
 				*convergence = LAPACK_ERROR;	
 				*error_code = info;
@@ -1091,7 +1091,7 @@ int* counter,int* convergence,int* error_code)
 			}
 		}else if(lapack_solver == LU){
 			// LU-solve step reusing LU-factorization in KKT0
-			F77_CALL(dgetrs)("N", &m_plus_n, &ione, KKT0, &m_plus_n,ipiv, delta_x, &m_plus_n, &info);
+			F77_CALL(dgetrs)("N", &m_plus_n, &ione, KKT0, &m_plus_n,ipiv, delta_x, &m_plus_n, &info FCONE);
 			if(info){
 				*convergence = LAPACK_ERROR;	
 				*error_code = info;
