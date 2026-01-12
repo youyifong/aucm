@@ -141,7 +141,7 @@ c     **********
 		w[i] = 0;
 		r[i] = t[i] = -g[i];
 	}
-	F77_CALL(dtrsv)("L", "N", "N", &n, L, &n, r, &inc FCONE);
+	F77_CALL(dtrsv)("L", "N", "N", &n, L, &n, r, &inc FCONE FCONE FCONE);
 
 	/* Initialize the direction p. */
 	memcpy(p, r, sizeof(double)*n);
@@ -164,7 +164,7 @@ c     **********
 		
 		/* Compute z by solving L'*z = p. */
 		memcpy(z, p, sizeof(double)*n);
-		F77_CALL(dtrsv)("L", "T", "N", &n, L, &n, z, &inc FCONE);
+		F77_CALL(dtrsv)("L", "T", "N", &n, L, &n, z, &inc FCONE FCONE FCONE);
 
 		/* Compute q by solving L*q = A*z and save L*q for
 		use in updating the residual t.	*/
