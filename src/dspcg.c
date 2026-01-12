@@ -176,7 +176,7 @@ c                       not allow further progress.
 		dprecond(nfree, B, L);
 		dtrpcg(nfree, B, gfree, delta, L, rtol*gfnorm, stol, w, &itertr, &infotr);
 		iters += itertr;
-		F77_CALL(dtrsv)("L", "T", "N", &nfree, L, &nfree, w, &inc FCONE);
+		F77_CALL(dtrsv)("L", "T", "N", &nfree, L, &nfree, w, &inc FCONE FCONE FCONE);
 
 		/* Use a projected search to obtain the next iterate.
 		The projected search algorithm stores s[k] in w. */
