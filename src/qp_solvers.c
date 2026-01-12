@@ -35,7 +35,7 @@ int ugradhes(int n, double *x, double *g, double **H)
 
 	/* evaluate the gradient g = A*x + g0 */
 	memcpy(g, LIN, sizeof(double)*n);
-	F77_CALL(dsymv)("U", &n, &one, HESS, &n, x, &inc, &one, g, &inc);
+	F77_CALL(dsymv)("U", &n, &one, HESS, &n, x, &inc, &one, g, &inc FCONE);
 
 	return 0;
 }
@@ -58,7 +58,7 @@ int ufv(int n, double *x, double *f)
 	#endif
 	return INT_MAX;
 	}
-	F77_CALL(dsymv)("U", &n, &one, HESS, &n, x, &inc, &zero, t, &inc);
+	F77_CALL(dsymv)("U", &n, &one, HESS, &n, x, &inc, &zero, t, &inc FCONE);
 	*f = 0.5*F77_CALL(ddot)(&n, x, &inc, t, &inc) + F77_CALL(ddot)(&n, x, &inc, LIN, &inc);
 	free(t);
 	return ++nfev;
