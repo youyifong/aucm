@@ -151,7 +151,8 @@ void minQuad_2(
         Q = (double**) calloc(n1n2,sizeof(double*));
         if(!Q){
 				//PRINTF("minQuad: Unable to allocate %lld(bytes)\n",n1n2*sizeof(double*));
-				//free_minQuad_2();return;}
+				free_minQuad_2();return;
+				}
         for(p = 0; p < n1n2; p++)Q[p] = _H + p*n1n2;
         state2.H = Q;
     }else{
