@@ -51,7 +51,7 @@ void free_QP(MNQD_QP* qp){
 double objective_QP(MNQD_QP* qp,double* x){    
 	// /* evaluate the function value f(x) = 0.5x'*H*x + b'*x */  
     int n = qp->n;double one = 1.0,zero = 0.0;int inc = 1;
-	F77_CALL(dsymv)("U", &n, &one, qp->H, &n, x, &inc, &zero, qp->dbuf, &inc);
+	F77_CALL(dsymv)("U", &n, &one, qp->H, &n, x, &inc, &zero, qp->dbuf, &inc FCONE);
 	return 0.5*F77_CALL(ddot)(&n, x, &inc, qp->dbuf, &inc) + F77_CALL(ddot)(&n, x, &inc, qp->b, &inc);
 }
 
@@ -244,8 +244,8 @@ int get_sub_QP(int n,int* ix,int do_inverse,int check_min_existence,MNQD_QP* Qp,
             for(int j = 0;j < qp->n;j++)b[j] = qp->b[j];  
             double buf[qp->n];
             double zero = 0.0,one = 1.0;int inc = 1;
-            F77_CALL(dsymv)("U", &n, &one, qp->iH, &n, &b[0], &inc, &zero, &buf[0], &inc);
-            F77_CALL(dsymv)("U", &n, &one, qp->H, &n, &buf[0], &inc, &zero, &b[0], &inc);
+            F77_CALL(dsymv)("U", &n, &one, qp->iH, &n, &b[0], &inc, &zero, &buf[0], &inc FCONE);
+            F77_CALL(dsymv)("U", &n, &one, qp->H, &n, &buf[0], &inc, &zero, &b[0], &inc FCONE);
             zero = 0.0; for(int j = 0;j < qp->n;j++)zero += (b[j] - qp->b[j]) * (b[j] - qp->b[j]);
             if(zero > .1){
 //                print_QP(qp);
@@ -353,8 +353,8 @@ int do_inverse,int check_min_existence,int rank,MNQD_QP* qp){
             double b[qp->n];
             for(int j = 0;j < qp->n;j++)b[j] = qp->b[j];  
             double zero = 0.0,one = 1.0;int inc = 1;
-            F77_CALL(dsymv)("U", &n, &one, qp->iH, &n, &b[0], &inc, &zero, qp->dbuf, &inc);//dbuf <- (H*)b 
-            F77_CALL(dsymv)("U", &n, &one, qp->H, &n, qp->dbuf, &inc, &zero, &b[0], &inc);//b <- H(H*)b
+            F77_CALL(dsymv)("U", &n, &one, qp->iH, &n, &b[0], &inc, &zero, qp->dbuf, &inc FCONE);//dbuf <- (H*)b 
+            F77_CALL(dsymv)("U", &n, &one, qp->H, &n, qp->dbuf, &inc, &zero, &b[0], &inc FCONE);//b <- H(H*)b
             zero = 0.0; for(int j = 0;j < qp->n;j++)zero += (b[j] - qp->b[j]) * (b[j] - qp->b[j]);
             if(zero > .1){
 //                print_QP(qp);
