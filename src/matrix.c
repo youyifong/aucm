@@ -13,7 +13,7 @@
 //#include <R_ext/RS.h> //R definitions for 'extending' R, registering functions,...
 
 
-#define PRINTF Rprintf
+#define PRINTF //Rprintf
 #define	MAX(A,B)	((A) > (B) ? (A) : (B))
 #define	MIN(A,B)	((A) < (B) ? (A) : (B))
 
@@ -139,9 +139,9 @@ void lower_trap(int nrx,int ncx,double* x,double* diag,int k,double* L){
 		if((i < 0) || (nrx <= i)) continue;
 		L[i + j * nrx] = (diag == NULL) ? x[dx++] : diag[dx++];//column major order
 		
-		// Rprintf("L(%i,%i)=%f d=%f\n",i,j,L[i + j * nrx],diag);
+		// //Rprintf("L(%i,%i)=%f d=%f\n",i,j,L[i + j * nrx],diag);
 	}
-	// Rprintf("length of diagonal %i\n",dx);
+	// //Rprintf("length of diagonal %i\n",dx);
 	
 	for(d = k + 1;d < K;d++){ // length of 'current' diagonal
 		for(j = 0;j < ncx;j++){ // move along diagonal 
@@ -398,8 +398,8 @@ void print_matrix(int m,int n,double* x){
 //    double (*x)[n] = (double (*)[n])_x;
     for(int i = 0;i < m;i++){
         for(int j = 0;j < n;j++)
-			Rprintf("%+.4e ",x[CX(i,j,m)]);
-        Rprintf("\n");
+			//Rprintf("%+.4e ",x[CX(i,j,m)]);
+        //Rprintf("\n");
     } 
 }
 
@@ -578,7 +578,7 @@ int ginv(double tol,int M, int N,double* x,double* xinv,double* sval){
 	// u,vt,s,D,work
 	int buffer_size = M*M + N*N + q + N * M + lwork; 
     double *_p = (double *) malloc(buffer_size * sizeof(double));
-	if(!_p){Rprintf("Memory allocation error\n");return 1;}
+	if(!_p){//Rprintf("Memory allocation error\n");return 1;}
 	double* p = _p;
 	
 	double* u = p;p+=M*M;
@@ -803,7 +803,7 @@ double* x,double* s,double* u,double* vt,int* info)
 	char const jobs[] = "NOSA";
 	char JOBU[2];JOBU[0] = jobs[*jobu];JOBU[1] = '\0';
 	char JOBV[2];JOBV[0] = jobs[*jobv];JOBV[1] = '\0';
-	// Rprintf("jobi(%i %i) jobs(%s,%s)\n",*jobu,*jobv,&JOBU[0],&JOBV[0]);
+	// //Rprintf("jobi(%i %i) jobs(%s,%s)\n",*jobu,*jobv,&JOBU[0],&JOBV[0]);
 	
 	// set leading dimensions to default values no matrices are submatrices here
 	int ldx = MAX(1,*nrx); 
@@ -816,13 +816,13 @@ double* x,double* s,double* u,double* vt,int* info)
 	else if(JOBV[0] == 'A')		
 		ldvt = *ncx;
 
-    // Rprintf("n=%i p=%i ldx=%i ldu=%i ldvt=%i\n",*nrx,*ncx,ldx,ldu,ldvt);
+    // //Rprintf("n=%i p=%i ldx=%i ldu=%i ldvt=%i\n",*nrx,*ncx,ldx,ldu,ldvt);
 	// dgesvd
     int lwork = -1;
 	double _work;
     F77_CALL(dgesvd)(JOBU, JOBV, nrx,ncx,x,&ldx,s,u,&ldu, vt,&ldvt,&_work,&lwork,info FCONE FCONE);
 	if(*info){
-		Rprintf("Illegal arguments to Lapack routine '%s' returning error code %d", "dgesvd" ,*info);
+		//Rprintf("Illegal arguments to Lapack routine '%s' returning error code %d", "dgesvd" ,*info);
 		return;
 	}
 	lwork = (int)_work;
@@ -830,7 +830,7 @@ double* x,double* s,double* u,double* vt,int* info)
     F77_CALL(dgesvd)(JOBU, JOBV, nrx,ncx,x,&ldx,s,u,&ldu, vt,&ldvt,work,&lwork,info FCONE FCONE);
 	free(work);
 	if(*info){
-		Rprintf("error code %d from Lapack routine '%s'", *info, "dgesvd");
+		//Rprintf("error code %d from Lapack routine '%s'", *info, "dgesvd");
 		//return;
 	}		
 }
@@ -851,7 +851,7 @@ double* x,double* s,double* u,double* vt,int* info)
 {
 	char const jobs[] = "NOSA";
 	char JOBU[2];JOBU[0] = jobs[*jobu];JOBU[1] = '\0';
-	//Rprintf("jobi(%i) jobs(%s)\n",*jobu,&JOBU[0]);
+	////Rprintf("jobi(%i) jobs(%s)\n",*jobu,&JOBU[0]);
 	
 	// set leading dimensions to default values no matrices are submatrices here
 	int ldx = MAX(1,*nrx); 
@@ -865,7 +865,7 @@ double* x,double* s,double* u,double* vt,int* info)
 		ldu = *nrx;
 		ldvt = *ncx;
 	}
-    // Rprintf("n=%i p=%i ldx=%i ldu=%i ldvt=%i\n",*nrx,*ncx,ldx,ldu,ldvt);
+    // //Rprintf("n=%i p=%i ldx=%i ldu=%i ldvt=%i\n",*nrx,*ncx,ldx,ldu,ldvt);
 		
 	// dgesdd
     int lwork = -1;
@@ -873,7 +873,7 @@ double* x,double* s,double* u,double* vt,int* info)
 	int *iwork = (int*) malloc(8*(size_t)(MIN(*nrx,*ncx) * sizeof(int)));
     F77_CALL(dgesdd)(JOBU,nrx,ncx,x,&ldx,s,u,&ldu,vt, &ldvt,&_work, &lwork, iwork, info FCONE);
 	if(*info){
-		Rprintf("Illegal arguments to Lapack routine '%s' returning error code %d", "dgesdd" , *info);
+		//Rprintf("Illegal arguments to Lapack routine '%s' returning error code %d", "dgesdd" , *info);
 		free(iwork);
 		return;
 	}
@@ -883,7 +883,7 @@ double* x,double* s,double* u,double* vt,int* info)
 	free(work);
 	free(iwork);
 	if(*info){
-		Rprintf("error code %d from Lapack routine '%s'", *info, "dgesdd");
+		//Rprintf("error code %d from Lapack routine '%s'", *info, "dgesdd");
 	}	
 }
 
@@ -912,7 +912,7 @@ void C_singval_dgesvd(int* nrx,int* ncx,double* _x,double* s,int* info)
 	double _work;
     F77_CALL(dgesvd)("N", "N", nrx,ncx,NULL,&ldx,s,NULL,&ldu,NULL,&ldvt,&_work,&lwork,info FCONE FCONE);
 	if(*info){
-		Rprintf("Illegal arguments to Lapack routine '%s' returning error code %d", "dgesvd" ,*info);
+		//Rprintf("Illegal arguments to Lapack routine '%s' returning error code %d", "dgesvd" ,*info);
 		return;
 	}
 	lwork = (int)_work;
@@ -923,7 +923,7 @@ void C_singval_dgesvd(int* nrx,int* ncx,double* _x,double* s,int* info)
 	free(work);
 	free(x);
 	if(*info){
-		Rprintf("error code %d from Lapack routine '%s'", *info, "dgesvd");
+		//Rprintf("error code %d from Lapack routine '%s'", *info, "dgesvd");
 		//return;
 	}		
 }
@@ -934,7 +934,7 @@ int ldlinv(int n,double* x,double* xinv){
 
 		int* ipiv = (int *)malloc((size_t)n * sizeof(int));
 		if(!ipiv){
-			Rprintf("Unable to allcoate %i bytes in function %s\n",n * sizeof(int),"ldlSolve");
+			////Rprintf("Unable to allcoate %i bytes in function %s\n",n * sizeof(int),"ldlSolve");
 			return 1;
 		}	
 		int LWORK = -1;
@@ -943,7 +943,7 @@ int ldlinv(int n,double* x,double* xinv){
 		F77_CALL(dsytrf)("U",&n,x,&n,ipiv,&WORK,&LWORK,&info FCONE); 
 		if(info){
 			free(ipiv);
-			Rprintf("error code %d from Lapack routine '%s'\n", info, "dsytrf");
+			////Rprintf("error code %d from Lapack routine '%s'\n", info, "dsytrf");
 			return 1;
 		}	
 		
@@ -951,14 +951,14 @@ int ldlinv(int n,double* x,double* xinv){
 		double* work = (double*)malloc((size_t)(LWORK * sizeof(double)));
 		if(!work){
 			free(ipiv);
-			Rprintf("Unable to allcoate %i bytes in function %s\n",LWORK * sizeof(double),"ldl_inv");
+			////Rprintf("Unable to allcoate %i bytes in function %s\n",LWORK * sizeof(double),"ldl_inv");
 			return 1;		
 		}
 		F77_CALL(dsytrf)("U",&n,x,&n,ipiv,work,&LWORK,&info FCONE); 
 		if(info){
 			free(ipiv);
 			free(work);
-			Rprintf("error code %d from Lapack routine '%s'\n", info, "dsytrf");
+			//Rprintf("error code %d from Lapack routine '%s'\n", info, "dsytrf");
 			return 1;
 		}
 		// set xinv to identity and solve for it
@@ -966,7 +966,7 @@ int ldlinv(int n,double* x,double* xinv){
 		for(int i = 0;i < n;i++)xinv[i*n+i] = 1.0;
 		F77_CALL(dsytrs)("U",&n,&n, x, &n, ipiv, xinv,&n,&info FCONE);
 		if(info){
-			Rprintf("error code %d from Lapack routine '%s'\n", info, "dsytrs");	
+			//Rprintf("error code %d from Lapack routine '%s'\n", info, "dsytrs");	
 			free(ipiv);
 			free(work);
 			return 1;

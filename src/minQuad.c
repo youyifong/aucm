@@ -806,7 +806,9 @@ FPRINTF(_F,"minQuad() initialization\n");
     if(!*mem_efficient) {
         if(n1n2 <= 0){PRINTF("Cannot allocate size n1n2 = 0 memory.\n");done = 1;}
         state.H = (double**) calloc(n1n2,sizeof(double*));
-        if(!state.H){PRINTF("minQuad: Unable to allocate %lld(bytes)\n",n1n2*sizeof(double*));free_minQuad();return;}
+        if(!state.H){
+				//PRINTF("minQuad: Unable to allocate %lld(bytes)\n",n1n2*sizeof(double*));
+				free_minQuad();return;}
         Q = state.H;
         for(p = 0; p < n1n2; p++)Q[p] = _H + p*n1n2;
         H = (void*)_H;

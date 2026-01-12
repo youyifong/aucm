@@ -191,7 +191,7 @@ int get_sub_solution(MNQD_QP* qp,MNQD_QP* sub,int np,int* px,int nq,int* qx,doub
     }          
 //  x[px] = -inv(Q[B[px],B[px]])bB[px]    
     double x0[np],none = -1.0,zero = 0.0;int inc = 1;
-    F77_CALL(dsymv)("U", &np, &none, sub->iH, &np, sub->b, &inc, &zero, &x0[0], &inc);
+    F77_CALL(dsymv)("U", &np, &none, sub->iH, &np, sub->b, &inc, &zero, &x0[0], &inc FCONE);
     for(int i = 0; i < np; i++)x[px[i]] = x0[i];
     // double (*ih)[np] = (double (*)[np])(sub->iH);
     // for(int i = 0; i < np; i++) {
@@ -629,7 +629,7 @@ int optimize_qp_exhaustive(MNQD_QP* qp, MNQD_QP* sub,double* solution,int flag,i
                 
 //                double fx = objective_QP(qp,x);
                 one = 1.0;zero = 0.0;inc = 1;
-                F77_CALL(dsymv)("U", &qp->n, &one, qp->H, &qp->n, x, &inc, &zero, qp->dbuf, &inc);
+                F77_CALL(dsymv)("U", &qp->n, &one, qp->H, &qp->n, x, &inc, &zero, qp->dbuf, &inc FCONE);
                 double fx = 0.5*F77_CALL(ddot)(&qp->n, x, &inc, qp->dbuf, &inc) + F77_CALL(ddot)(&qp->n, x, &inc, qp->b, &inc);
                 if(fx < best_fx){
                     best_fx = fx;
@@ -657,7 +657,7 @@ int optimize_qp_exhaustive(MNQD_QP* qp, MNQD_QP* sub,double* solution,int flag,i
         next_hypercube_vertex(i+1,n,qp->xl[0],qp->xu[0],x);        
 //        double fx = objective_QP(qp,x);
         double one = 1.0,zero = 0.0;int inc = 1;
-        F77_CALL(dsymv)("U", &qp->n, &one, qp->H, &qp->n, x, &inc, &zero, qp->dbuf, &inc);
+        F77_CALL(dsymv)("U", &qp->n, &one, qp->H, &qp->n, x, &inc, &zero, qp->dbuf, &inc FCONE);
         double fx = 0.5*F77_CALL(ddot)(&qp->n, x, &inc, qp->dbuf, &inc) + F77_CALL(ddot)(&qp->n, x, &inc, qp->b, &inc);
         if(trace > 1){PRINTF("f(x)=%+.3e x=",fx);for(int q = 0; q < n; q++)PRINTF("%+.3e ",x[q]);PRINTF("\n");} 
         if(fx < best_fx){

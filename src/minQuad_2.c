@@ -149,7 +149,9 @@ void minQuad_2(
     if(!(*mem_efficient)) {
         if(n1n2 <= 0){PRINTF("Cannot allocate size n1n2 = 0 memory.\n");done = 1;}
         Q = (double**) calloc(n1n2,sizeof(double*));
-        if(!Q){PRINTF("minQuad: Unable to allocate %lld(bytes)\n",n1n2*sizeof(double*));free_minQuad_2();return;}
+        if(!Q){
+				//PRINTF("minQuad: Unable to allocate %lld(bytes)\n",n1n2*sizeof(double*));
+				//free_minQuad_2();return;}
         for(p = 0; p < n1n2; p++)Q[p] = _H + p*n1n2;
         state2.H = Q;
     }else{
